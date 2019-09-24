@@ -7,6 +7,7 @@ using OpenQA.Selenium.Support.UI;
 using Xunit;
 using System.Threading;
 using OpenQA.Selenium.Interactions;
+using System.Text.RegularExpressions;
 
 namespace SpecFlow.Selenium.PageObjects
 {
@@ -14,7 +15,7 @@ namespace SpecFlow.Selenium.PageObjects
     {
         private readonly IWebDriver _driver;
         private string _url = "https://www.amazon.com/";
-        private int value;
+        private float value;
 
         //Init driver
         public AmazonPage(IWebDriver driver) : base(driver)
@@ -76,8 +77,11 @@ namespace SpecFlow.Selenium.PageObjects
         {
             Thread.Sleep(2000);
             string tPrice = PriceTag.Text.ToString();
-            tPrice = tPrice.Trim((new Char[] { '$' }));
-            int Price = int.Parse(tPrice);
+            char[] charsToTrim = { '$'};
+            tPrice = tPrice.Trim(charsToTrim);
+            string replaceWith = ".";
+            string removedBreaks = tPrice.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
+            float Price = float.Parse(removedBreaks);
             value = Price;
 
             
@@ -86,11 +90,16 @@ namespace SpecFlow.Selenium.PageObjects
         //Compare prices
         public void ComparePrice()
         {
-           //Thread.Sleep(1500);
-           //string oPrice = OurPrice.Text.ToString();
-           //oPrice = oPrice.Trim((new Char[] { '$' }));
-           //int cPrice = int.Parse(oPrice);
-           //Console.WriteLine("Comparing Price in the Search Page: " + value + " with Price in the Product selection: " + cPrice + " the result is: " + value.CompareTo(cPrice));
+           Thread.Sleep(1500);
+           string oPrice = OurPrice.Text.ToString();
+            char[] charsToTrim = { '$' };
+            oPrice = oPrice.Trim(charsToTrim);
+            string replaceWith = ".";
+            string removedBreaks = oPrice.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
+            float Prices = float.Parse(removedBreaks);
+            int Result = Prices.CompareTo(value);
+            Console.WriteLine("Comparing Price in the Search Page: " + value + " with Price in the Product selection: " + removedBreaks + " the result is: " + Result);
+
         }
         //Add to Cart
         public void AddToCart()
@@ -133,7 +142,7 @@ namespace SpecFlow.Selenium.PageObjects
 
         public IWebElement PriceTag => _driver.FindElement(By.XPath("//span[@class='celwidget slot=SEARCH_RESULTS template=SEARCH_RESULTS widgetId=search-results index=1']//span[@class='a-price']//span[@aria-hidden='true']"));
 
-        public IWebElement FirstItem => _driver.FindElement(By.XPath("/html/body/div[1]/div[2]/div[1]/div[2]/div/span[3]/div[1]/div[2]/div/span/div/div/div[2]/div[2]/div/div[1]/div/div/div[1]/h2/a"));
+        public IWebElement FirstItem => _driver.FindElement(By.XPath("/html/body/div[1]/div[1]/div[1]/div[2]/div/span[3]/div[1]/div[1]/div/span/div/div/div[2]/div[2]/div/div[1]/div/div/div[1]/h2/a/span"));
 
         public IWebElement OurPrice => _driver.FindElement(By.XPath("//*[@id='priceblock_ourprice']"));
 

@@ -31,6 +31,7 @@ namespace SpecFlow.Selenium.StepDefinitions
 		[Given(@"select ""(.*)"" in the search results")]
 		public void WhenSelectInTheSearchResults(string library)
 		{
+            _page.StorePrice();
 			_page.SelectResult();
 		}
 
